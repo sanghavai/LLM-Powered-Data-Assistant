@@ -6,59 +6,55 @@ from streamlit_chat import message
 
 st.set_page_config(page_title="AutoML Analyst", layout="wide")
 
-st.title("🤖 AutoML Analyst - LLM Powered Data Assistant")
+st.markdown("""
+# 🤖 AutoML Analyst  
+*LLM-Powered Exploratory Data Assistant*
+""")
 
-uploaded_file = st.file_uploader("Upload your csv file", type=['csv'])
+st.markdown("""
+Upload a CSV and interact with your data using natural language.  
+Get automated visualizations, correlation matrices, and more.
+""")
+
+with st.sidebar:
+    st.header("📁 Upload Data")
+    uploaded_file = st.file_uploader("Upload a CSV file", type=["csv"])
+    if uploaded_file:
+        st.success("✅ File uploaded successfully.")
 
 if uploaded_file:
-    st.success('File uploaded successfully!')
     df = pd.read_csv(uploaded_file)
-    preview_dataset(df)
 
-    if st.button("Run EDA"):
-        st.session_state.show_eda = True
+    tab1, tab2, tab3 = st.tabs(["🔍 Preview", "📊 EDA", "💬 Chat"])
 
-    if st.session_state.get("show_eda", False):
-        if "corr_method" not in st.session_state:
-            st.session_state.corr_method = "pearson"
+    with tab1:
+        preview_dataset(df)
 
-        st.session_state.corr_method = st.selectbox(
-            "Choose correlation method", ["pearson", "spearman", "kendall"],
-            index=["pearson", "spearman", "kendall"].index(st.session_state.corr_method),
-            key="corr_method_selectbox"
-        )
+    with tab2:
+        st.markdown("### Exploratory Data Analysis")
+        corr_method = st.selectbox("Select correlation method", ["pearson", "spearman", "kendall"])
+        show_eda(df, method=corr_method)
 
-        show_eda(df, method=st.session_state.corr_method)
+    with tab3:
+        agent = create_agent(df)
+        st.markdown("### Ask Questions About Your Data")
+        st.info("Example: *Which column has the most missing values?*")
 
-    agent = create_agent(df)
+        if "chat_history" not in st.session_state:
+            st.session_state.chat_history = []
 
-    st.markdown("### 💬 Chat with Your Dataset")
-    st.markdown("""
-    <div style='padding: 1rem; background-color: #808080; border-radius: 10px; margin-bottom: 1rem;'>
-    🤖 <b>I am your AutoML Analyst</b> – a local LLM agent who can answer questions based on the dataset you uploaded.  <br>
-    Please ask <b>only dataset-related questions</b>. For example:
-    <ul>
-      <li>Which column has the most missing values?</li>
-      <li>How many unique values does 'Gender' have?</li>
-    </ul>
-    </div>
-    """, unsafe_allow_html=True)
+        user_input = st.text_input("Your question:")
+        if user_input:
+            st.session_state.chat_history.append({"role": "user", "content": user_input})
+            with st.spinner("Thinking..."):
+                response = agent.run(user_input)
+            st.session_state.chat_history.append({"role": "assistant", "content": response})
 
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
-
-    user_input = st.text_input("Ask something about your dataset:")
-
-    if user_input:
-        st.session_state.chat_history.append({"role": "user", "content": user_input})
-
-        with st.spinner("Thinking..."):
-            response = agent.run(user_input)
-
-        st.session_state.chat_history.append({"role": "assistant", "content": response})
-
-    for msg in st.session_state.chat_history:
-        if msg["role"] == "user":
-            message(msg["content"], is_user=True, key=msg["content"] + "_user")
-        else:
-            message(msg["content"], is_user=False, key=msg["content"] + "_ai")
+        for i, msg in enumerate(st.session_state.chat_history):
+            key = f"chat_{i}"
+            if msg["role"] == "user":
+                message(msg["content"], is_user=True, key=key)
+            else:
+                message(msg["content"], is_user=False, key=key)
+else:
+    st.info("Please upload a CSV file to get started.")

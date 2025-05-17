@@ -1,16 +1,16 @@
 from langchain.agents import initialize_agent, Tool, AgentExecutor
 from langchain.agents.agent_types import AgentType
-from utils.llm_utils import get_mistral_llm
+from utils.llm_utils import get_deepseek_llm
 from utils.pandas_data_tool import PandasDataTool
 
 def create_agent(df):
-    llm = get_mistral_llm()
+    llm = get_deepseek_llm()
     pandas_tool = PandasDataTool(df=df)
 
     tools = [
         Tool(
             name=pandas_tool.name,
-            func=pandas_tool._run,  # use _run method, not run
+            func=pandas_tool._run,  # Use _run method, not run
             description=pandas_tool.description
         )
     ]

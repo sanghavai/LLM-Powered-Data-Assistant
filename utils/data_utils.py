@@ -17,7 +17,6 @@ def preview_dataset(df):
     missing = df.isnull().sum()
     st.write(missing[missing > 0])
 
-
 def show_eda(df, method="pearson"):
     st.subheader("📈 Univariate Distributions")
     numeric_cols = df.select_dtypes(include='number').columns.tolist()
@@ -34,13 +33,11 @@ def show_eda(df, method="pearson"):
                 sns.histplot(df[col_name].dropna(), kde=True, ax=ax)
                 st.pyplot(fig)
 
-    # Wrap correlation matrix in expander
     with st.expander("🔗 Correlation Matrix"):
         st.write(f"**Method:** `{method}`")
 
         if len(numeric_cols) >= 2:
             corr = df[numeric_cols].corr(method=method)
-
             fig, ax = plt.subplots(figsize=(6, 4))
             sns.heatmap(
                 corr,
