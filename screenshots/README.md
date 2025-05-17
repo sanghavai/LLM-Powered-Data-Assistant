@@ -35,12 +35,12 @@ Make sure Ollama is installed and running:
 
 * [https://ollama.com](https://ollama.com)
 
-You should have a local model like `mistral` or `codestral` installed:
+You should have a local model like `mistral` or `deepseek-coder:6.7b` installed:
 
 ```bash
 ollama run mistral
 # or
-ollama run codestral
+ollama run deepseek-coder:6.7b
 ```
 
 ### 3. Run the App
