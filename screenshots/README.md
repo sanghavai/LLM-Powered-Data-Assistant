@@ -1,4 +1,3 @@
-````markdown
 # 🤖 AutoML Analyst – LLM-Powered Data Assistant
 
 AutoML Analyst is a local, open-source data assistant that uses a lightweight LLM (like Mistral via Ollama or Codestral) to help you explore and understand CSV datasets. Upload your data, run automated EDA, and chat with your dataset in plain English — all from a clean Streamlit UI.
@@ -104,5 +103,3 @@ MIT License. Free for personal and educational use.
 ## 🙌 Contributions
 
 Feel free to fork, improve, and contribute via PRs!
-
-```
